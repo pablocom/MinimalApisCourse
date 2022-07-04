@@ -4,6 +4,8 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -13,7 +15,7 @@ builder.Services.AddSingleton<GuidGenerator>();
 var app = builder.Build();
 
 //app.UseMiddleware<CookiePolicyMiddleware>();
-
+app.MapControllers();
 app.UseSwagger();
 app.UseSwaggerUI();
 
