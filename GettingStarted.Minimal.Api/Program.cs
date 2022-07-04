@@ -4,12 +4,18 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 builder.Services.AddSingleton<PeopleService>();
 builder.Services.AddSingleton<GuidGenerator>();
 
 var app = builder.Build();
 
 //app.UseMiddleware<CookiePolicyMiddleware>();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapGet("/", () => "Hello from GET");
 app.MapPost("/", () => "Hello from POST");
