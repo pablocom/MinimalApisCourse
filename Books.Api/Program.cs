@@ -1,5 +1,5 @@
+using Books.Api;
 using Books.Api.Dtos;
-using Books.Api.Models;
 using Books.Api.Persistance;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,79 +10,62 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<BooksDbContext>(x => x.UseSqlite($"Data Source=books.db;"));
+builder.Services.AddScoped<IBookManagementService, BookManagementService>();
 
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.MapGet("/books/{isbn}", async (string isbn, BooksDbContext dbContext) =>
+app.MapGet("/books/{isbn}", async (string isbn, [FromServices] IBookManagementService booksService) =>
 {
-    var book = await dbContext.Books.FirstOrDefaultAsync(x => x.Isbn == isbn);
-    if (book is null)
+    if (await booksService.ExistsAsync(isbn))
         return Results.NotFound();
 
+    var book = await booksService.GetByIsbnAsync(isbn);
     return Results.Ok(book);
 });
 
-app.MapGet("/books", async ([FromQuery] string searchTerm, [FromServices] BooksDbContext dbContext) =>
+app.MapGet("/books", async ([FromQuery] string searchTerm, [FromServices] IBookManagementService booksService) =>
 {
-    var books = await dbContext.Books
-        .Where(b => b.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToArrayAsync();
+    var books = await booksService.GetBySearchTermAsync(searchTerm);
     return Results.Ok(books);
 });
 
-app.MapGet("/books", async ([FromServices] BooksDbContext dbContext) =>
+app.MapGet("/books", async ([FromServices] IBookManagementService booksService) =>
 {
-    var allBooks = await dbContext.Books.ToArrayAsync();
+    var allBooks = await booksService.GetAllAsync();
     return Results.Ok(allBooks);
 });
 
-app.MapPost("/books", async (BookDto dto, [FromServices] BooksDbContext dbContext) =>
+app.MapPost("/books", async (BookDto dto, [FromServices] IBookManagementService booksService) =>
 {
-    var book = new Book
-    {
-        Isbn = dto.Isbn,
-        Author = dto.Author,
-        Title = dto.Title,
-        ShortDescription = dto.ShortDescription,
-        PageCount = dto.PageCount,
-        ReleaseDate = dto.ReleaseDate,
-    };
-
-    dbContext.Books.Add(book);
-    await dbContext.SaveChangesAsync();
-
-    return Results.Ok(book);
-});
-
-app.MapPut("/books/{isbn}", async (string isbn, BookDto dto, [FromServices] BooksDbContext dbContext) =>
-{
-    var book = await dbContext.Books.FirstOrDefaultAsync(b => b.Isbn == isbn);
-    if (book is null)
+    if (await booksService.ExistsAsync(dto.Isbn))
         return Results.NotFound();
 
-    book.Author = dto.Author;
-    book.Title = dto.Title;
-    book.ShortDescription = dto.ShortDescription;
-    book.PageCount = dto.PageCount;
-    book.ReleaseDate = dto.ReleaseDate;
+    await booksService.AddAsync(dto);
 
-    await dbContext.SaveChangesAsync();
-
-    return Results.Ok(book);
+    return Results.Ok();
 });
 
-app.MapDelete("/books/{isbn}", async (string isbn, [FromServices] BooksDbContext dbContext) => 
+app.MapPut("/books/{isbn}", async (string isbn, BookDto dto, [FromServices] IBookManagementService booksService) =>
 {
-    var book = await dbContext.Books.FirstOrDefaultAsync(b => b.Isbn == isbn);
-    if (book is null)
+    if (await booksService.ExistsAsync(isbn))
         return Results.NotFound();
 
-    dbContext.Books.Remove(book);
-    await dbContext.SaveChangesAsync();
+    await booksService.EditAsync(dto);
 
-    return Results.NoContent();
+    return Results.Ok();
+});
+
+app.MapDelete("/books/{isbn}", async (string isbn, [FromServices] IBookManagementService booksService) => 
+{
+    if (await booksService.ExistsAsync(isbn))
+        return Results.NotFound();
+
+    await booksService.RemoveAsync(isbn);
+
+    return Results.Ok();
 });
 
 app.Run();
