@@ -28,7 +28,7 @@ app.MapGet("/books/{isbn}", async (string isbn, [FromServices] IBookManagementSe
 
 app.MapGet("/books", async ([FromQuery] string searchTerm, [FromServices] IBookManagementService booksService) =>
 {
-    var books = await booksService.GetBySearchTermAsync(searchTerm);
+    var books = await booksService.SearchAsync(searchTerm);
     return Results.Ok(books);
 });
 

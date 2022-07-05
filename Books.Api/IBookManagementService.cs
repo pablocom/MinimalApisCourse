@@ -7,7 +7,7 @@ public interface IBookManagementService
 {
     Task<Book> GetByIsbnAsync(string isbn);
     Task<IEnumerable<Book>> GetAllAsync();
-    Task<IEnumerable<Book>> GetBySearchTermAsync(string searchTerm);
+    Task<IEnumerable<Book>> SearchAsync(string searchTerm);
     Task AddAsync(BookDto bookDto);
     Task EditAsync(BookDto bookDto);
     Task RemoveAsync(string isbn);

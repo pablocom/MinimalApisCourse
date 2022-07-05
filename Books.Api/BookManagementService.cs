@@ -65,7 +65,7 @@ public class BookManagementService : IBookManagementService
         return await _dbContext.Books.SingleAsync(x => x.Isbn == isbn);
     }
 
-    public async Task<IEnumerable<Book>> GetBySearchTermAsync(string searchTerm)
+    public async Task<IEnumerable<Book>> SearchAsync(string searchTerm)
     {
         return await _dbContext.Books
             .Where(b => b.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToArrayAsync();
