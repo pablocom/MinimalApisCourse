@@ -1,9 +1,9 @@
+using Extending.Library.Api;
+using Extending.Library.Api.Data;
+using Extending.Library.Api.Models;
+using Extending.Library.Api.Services;
 using FluentValidation;
 using FluentValidation.Results;
-using Library.Api;
-using Library.Api.Data;
-using Library.Api.Models;
-using Library.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
