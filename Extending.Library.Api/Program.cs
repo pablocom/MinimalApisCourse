@@ -33,7 +33,7 @@ app.UseSwaggerUI();
 app.UseAuthorization();
 
 app.MapPost("books",
-    [Authorize(AuthenticationSchemes = ApiKeySchemeConstants.SchemeName)]
+    // [Authorize(AuthenticationSchemes = ApiKeySchemeConstants.SchemeName)]
     async (Book book, IBookService bookService, IValidator<Book> validator) =>
 {
     var validationResult = await validator.ValidateAsync(book);
