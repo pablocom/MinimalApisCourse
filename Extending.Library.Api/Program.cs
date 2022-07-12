@@ -66,7 +66,8 @@ app.MapPost("/books",
     .WithName("CreateBook")
     .Accepts<Book>(MediaTypeNames.Application.Json)
     .Produces<Book>(StatusCodes.Status201Created)
-    .Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest);
+    .Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest)
+    .WithTags("Books");
 
 app.MapGet("/books", async (IBookService bookService, string? searchTerm) =>
     {
@@ -76,7 +77,8 @@ app.MapGet("/books", async (IBookService bookService, string? searchTerm) =>
         return Results.Ok(books);
     })
     .WithName("GetBooks")
-    .Produces<IEnumerable<Book>>(StatusCodes.Status200OK);
+    .Produces<IEnumerable<Book>>(StatusCodes.Status200OK)
+    .WithTags("Books");
 
 app.MapGet("/books/{isbn}", async (string isbn, IBookService bookService) =>
     {
@@ -86,7 +88,8 @@ app.MapGet("/books/{isbn}", async (string isbn, IBookService bookService) =>
     .WithName("GetBook")
     .Accepts<Book>(MediaTypeNames.Application.Json)
     .Produces<Book>(StatusCodes.Status201Created)
-    .Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest);
+    .Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest)
+    .WithTags("Books");
 
 app.MapPut("/books/{isbn}", async (string isbn, Book book, IBookService bookService, IValidator<Book> validator) =>
     {
@@ -101,7 +104,8 @@ app.MapPut("/books/{isbn}", async (string isbn, Book book, IBookService bookServ
     .WithName("UpdateBook")
     .Accepts<Book>(MediaTypeNames.Application.Json)
     .Produces<Book>(StatusCodes.Status200OK)
-    .Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest);
+    .Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest)
+    .WithTags("Books");
 
 app.MapDelete("/books/{isbn}", async (string isbn, IBookService bookService) =>
     { 
@@ -111,7 +115,8 @@ app.MapDelete("/books/{isbn}", async (string isbn, IBookService bookService) =>
     })
     .WithName("DeleteBook")
     .Produces(StatusCodes.Status204NoContent)
-    .Produces(StatusCodes.Status404NotFound);
+    .Produces(StatusCodes.Status404NotFound)
+    .WithTags("Books");
 
 var databaseInitializer = app.Services.GetRequiredService<DatabaseInitializer>();
 await databaseInitializer.InitializeAsync();
