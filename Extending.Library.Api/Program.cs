@@ -125,6 +125,19 @@ app.MapDelete("/books/{isbn}", async (string isbn, IBookService bookService) =>
     .Produces(StatusCodes.Status404NotFound)
     .WithTags("Books");
 
+app.MapGet("status", () =>
+{
+    return Results.Extensions.Html(@"<!doctype html>
+<html>
+    <head><title>Status page</title></head>
+    <body>
+        <h1>Status</h1>
+        <p>Server working fine. </p>
+    </body>
+</html>
+");
+});
+
 var databaseInitializer = app.Services.GetRequiredService<DatabaseInitializer>();
 await databaseInitializer.InitializeAsync();
 
