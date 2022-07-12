@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Globalization;
+using System.Reflection;
 
 namespace GettingStarted.Minimal.Api;
 
@@ -7,6 +8,7 @@ public class MapPoint
     public double Latitude { get; set; }
     public double Longitude { get; set; }
 
+    // Also vaid to bind parameters to objects
     //public static bool TryParse(string? value, out MapPoint? point)
     //{
     //    try

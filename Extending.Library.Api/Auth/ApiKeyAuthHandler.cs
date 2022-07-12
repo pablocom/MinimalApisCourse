@@ -10,8 +10,7 @@ public class ApiKeyAuthHandler : AuthenticationHandler<ApiKeyAuthSchemeOptions>
 {
     public ApiKeyAuthHandler(IOptionsMonitor<ApiKeyAuthSchemeOptions> options, ILoggerFactory logger, 
         UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
-    {
-    }
+    { }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -33,9 +32,7 @@ public class ApiKeyAuthHandler : AuthenticationHandler<ApiKeyAuthSchemeOptions>
         };
 
         var claimsIdentity = new ClaimsIdentity(claims, "ApiKey");
-
         var ticket = new AuthenticationTicket(new ClaimsPrincipal(claimsIdentity), Scheme.Name);
-
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 }
