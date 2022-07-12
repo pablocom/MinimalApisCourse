@@ -5,12 +5,19 @@ using Extending.Library.Api.Models;
 using Extending.Library.Api.Services;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Mvc;
 using System.Net.Mime;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
     Args = args,
     ApplicationName = "Extending.Library.Api",
+});
+
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+    options.JsonSerializerOptions.IncludeFields = true;
 });
 
 builder.Configuration.AddJsonFile("appsettings.Local.json", true, true);
