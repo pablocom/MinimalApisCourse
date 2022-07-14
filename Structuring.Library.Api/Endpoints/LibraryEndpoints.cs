@@ -1,51 +1,54 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Mvc;
+using Structuring.Library.Api.Endpoints.Internal;
 using Structuring.Library.Api.Models;
 using Structuring.Library.Api.Services;
 using System.Net.Mime;
 
 namespace Structuring.Library.Api.Endpoints;
 
-public static class LibraryEndpoints
+public class LibraryEndpoints : IEndpoints
 {
-    public static void AddLibraryEndpoints(this IServiceCollection services)
+    private const string Tag = "Books";
+    private const string BaseRoute = "books";
+
+    public static void AddServices(IServiceCollection services,  IConfiguration configuration)
     {
         services.AddSingleton<IBookService, BookService>();
     }
 
-    public static void UseLibraryEndpoints(this IEndpointRouteBuilder app)
+    public static void DefineEndpoints(IEndpointRouteBuilder app)
     {
-        app.MapPost("/books", CreateBookAsync)
+        app.MapPost(BaseRoute, CreateBookAsync)
             .WithName("CreateBook")
             .Accepts<Book>(MediaTypeNames.Application.Json)
             .Produces<Book>(StatusCodes.Status201Created)
             .Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest)
-            .WithTags("Books");
+            .WithTags(Tag);
 
-        app.MapGet("/books", GetBooksAsync)
-            .WithName("GetBooks")
+        app.MapGet(BaseRoute, SearchBooksAsync)
+            .WithName("SearchBooks")
             .Produces<IEnumerable<Book>>(StatusCodes.Status200OK)
-            .WithTags("Books");
+            .WithTags(Tag);
 
-        app.MapGet("/books/{isbn}", GetBookByIsbnAsync)
+        app.MapGet($"{BaseRoute}/{{isbn}}", GetBookByIsbnAsync)
             .WithName("GetBook")
             .Accepts<Book>(MediaTypeNames.Application.Json)
-            .Produces<Book>(StatusCodes.Status201Created)
-            .Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest)
-            .WithTags("Books");
+            .Produces<Book>(StatusCodes.Status201Created).Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest)
+            .WithTags(Tag);
 
-        app.MapPut("/books/{isbn}", EditBookAsync)
+        app.MapPut($"{BaseRoute}/{{isbn}}", EditBookAsync)
             .WithName("UpdateBook")
             .Accepts<Book>(MediaTypeNames.Application.Json)
-            .Produces<Book>(StatusCodes.Status200OK)
-            .Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest)
-            .WithTags("Books");
+            .Produces<Book>(StatusCodes.Status200OK).Produces<IEnumerable<ValidationFailure>>(StatusCodes.Status400BadRequest)
+            .WithTags(Tag);
 
-        app.MapDelete("/books/{isbn}", DeleteBookAsync)
+        app.MapDelete($"{BaseRoute}/{{isbn}}", DeleteBookAsync)
             .WithName("DeleteBook")
             .Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
-            .WithTags("Books");
+            .WithTags(Tag);
     }
 
     private static async Task<IResult> CreateBookAsync(Book book, IBookService bookService, IValidator<Book> validator,
@@ -69,11 +72,11 @@ public static class LibraryEndpoints
         return Results.Created(locationUri, book);
     }
 
-    private static async Task<IResult> GetBooksAsync(IBookService bookService, string? searchTerm)
+    private static async Task<IResult> SearchBooksAsync(IBookService bookService, [FromQuery] string? searchTerm)
     {
         var books = searchTerm is not null ?
-                 await bookService.SearchByTitleAsync(searchTerm) :
-                 await bookService.GetAllAsync();
+            await bookService.SearchByTitleAsync(searchTerm) :
+            await bookService.GetAllAsync();
         return Results.Ok(books);
     }
 

@@ -1,6 +1,6 @@
 using FluentValidation;
 using Structuring.Library.Api.Data;
-using Structuring.Library.Api.Endpoints;
+using Structuring.Library.Api.Endpoints.Internal;
 
 var builder = WebApplication.CreateBuilder();
 
@@ -13,7 +13,8 @@ builder.Services.AddSingleton<IDbConnectionFactory>(_ =>
     new SqliteConnectionFactory(builder.Configuration.GetValue<string>("Database:ConnectionString"))
 );
 
-builder.Services.AddLibraryEndpoints();
+builder.Services.AddEndpoints<Program>(builder.Configuration);
+
 builder.Services.AddSingleton<DatabaseInitializer>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
@@ -22,7 +23,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseLibraryEndpoints();
+app.UseEndpoints<Program>();
 
 var databaseInitializer = app.Services.GetRequiredService<DatabaseInitializer>();
 await databaseInitializer.InitializeAsync();
