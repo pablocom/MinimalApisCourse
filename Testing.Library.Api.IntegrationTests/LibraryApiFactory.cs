@@ -2,17 +2,14 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Testing.Library.Api.Data;
 
-namespace Testing.Library.Api.IntegrationTests;
+namespace Testing.Library.Api.EndToEndTests;
 
 public class LibraryApiFactory : WebApplicationFactory<ILibraryApiMarker>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         base.ConfigureWebHost(builder);
-        builder.ConfigureServices(services =>
-        {
-            ConfigureInMemoryDatabase(services);
-        });
+        builder.ConfigureServices(ConfigureInMemoryDatabase);
     }
 
     private static void ConfigureInMemoryDatabase(IServiceCollection services)

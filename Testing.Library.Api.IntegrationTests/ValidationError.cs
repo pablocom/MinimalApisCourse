@@ -1,4 +1,4 @@
-﻿namespace Testing.Library.Api.IntegrationTests;
+﻿namespace Testing.Library.Api.EndToEndTests;
 
 public class ValidationError
 {

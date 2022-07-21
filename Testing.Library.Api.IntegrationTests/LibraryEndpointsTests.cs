@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
-using System.Net;
+﻿using System.Net;
 using Testing.Library.Api.Models;
 
-namespace Testing.Library.Api.IntegrationTests;
+namespace Testing.Library.Api.EndToEndTests;
 
 public class LibraryEndpointsTests : IClassFixture<LibraryApiFactory>, IAsyncLifetime
 {
