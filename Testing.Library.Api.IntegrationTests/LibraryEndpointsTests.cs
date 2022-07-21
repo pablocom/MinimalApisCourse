@@ -18,7 +18,7 @@ public class LibraryEndpointsTests : IClassFixture<WebApplicationFactory<ILibrar
     public async Task CreateBook_CreatesBook_WhenDataIsCorrect()
     {
         var httpClient = _factory.CreateClient();
-        var book = GenerateBook();
+        var book = BuildBook();
 
         var result = await httpClient.PostAsJsonAsync("/books", book);
         var createdBook = await result.Content.ReadFromJsonAsync<Book>();
@@ -33,7 +33,7 @@ public class LibraryEndpointsTests : IClassFixture<WebApplicationFactory<ILibrar
     public async Task CreateBook_Fails_WhenIsbnIsInvalid()
     {
         var httpClient = _factory.CreateClient();
-        var book = GenerateBook();
+        var book = BuildBook();
         book.Isbn = "INVALID";
 
         var result = await httpClient.PostAsJsonAsync("/books", book);
@@ -49,7 +49,7 @@ public class LibraryEndpointsTests : IClassFixture<WebApplicationFactory<ILibrar
     public async Task CreateBook_Fails_WhenBookExists()
     {
         var httpClient = _factory.CreateClient();
-        var book = GenerateBook();
+        var book = BuildBook();
 
         await httpClient.PostAsJsonAsync("/books", book);
         _createdIsbns.Add(book!.Isbn);
@@ -62,7 +62,77 @@ public class LibraryEndpointsTests : IClassFixture<WebApplicationFactory<ILibrar
         error.ErrorMessage.Should().Be("A book with this ISBN-13 already exists");
     }
 
-    private Book GenerateBook(string title = "The Dirty Coder")
+    [Fact]
+    public async Task GetBook_ReturnsBook_WhenBookExists()
+    {
+        var httpClient = _factory.CreateClient();
+        var book = BuildBook();
+        await httpClient.PostAsJsonAsync("/books", book);
+        _createdIsbns.Add(book.Isbn);
+
+        var result = await httpClient.GetAsync($"books/{book.Isbn}");
+        var existingBook = await result.Content.ReadFromJsonAsync<Book>();
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        existingBook.Should().BeEquivalentTo(book);
+    }
+
+    [Fact]
+    public async Task GetBook_ReturnsNotFound_WhenBookDoesNotExists()
+    {
+        var httpClient = _factory.CreateClient();
+        var book = BuildBook();
+
+        var result = await httpClient.GetAsync($"books/{book.Isbn}");
+
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task GetAllBooks_ReturnsAllBooks_WhenBooksExist()
+    {
+        var httpClient = _factory.CreateClient();
+        var book = BuildBook();
+        await httpClient.PostAsJsonAsync("/books", book);
+        _createdIsbns.Add(book.Isbn);
+
+        var result = await httpClient.GetAsync("books");
+        var existingBooks = await result.Content.ReadFromJsonAsync<Book[]>();
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        existingBooks.Should().BeEquivalentTo(new[] { book });
+    }
+
+    [Fact]
+    public async Task GetAllBooks_ReturnsNoBooks_WhenNoBooksExist()
+    {
+        var httpClient = _factory.CreateClient();
+
+        var result = await httpClient.GetAsync("books");
+        var existingBooks = await result.Content.ReadFromJsonAsync<Book[]>();
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        existingBooks.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task SearchBooks_ReturnsBooks_WhenTitleContainsSearchCriteria()
+    {
+        var httpClient = _factory.CreateClient();
+        var bookToBeFound = BuildBook("Clean coder"); 
+        var bookToNotBeFound = BuildBook("To not match criteria");
+        await httpClient.PostAsJsonAsync("/books", bookToBeFound);
+        await httpClient.PostAsJsonAsync("/books", bookToNotBeFound);
+        _createdIsbns.AddRange(new[] { bookToBeFound.Isbn, bookToNotBeFound.Isbn });
+
+        var result = await httpClient.GetAsync("books?searchTerm=oder");
+        var matchingBooks = await result.Content.ReadFromJsonAsync<Book[]>();
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        matchingBooks.Should().BeEquivalentTo(new[] { bookToBeFound });
+    }
+
+    private Book BuildBook(string title = "The Dirty Coder")
     {
         return new Book
         {
