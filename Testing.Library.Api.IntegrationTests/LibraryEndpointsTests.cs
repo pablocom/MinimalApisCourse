@@ -4,12 +4,12 @@ using Testing.Library.Api.Models;
 
 namespace Testing.Library.Api.IntegrationTests;
 
-public class LibraryEndpointsTests : IClassFixture<WebApplicationFactory<ILibraryApiMarker>>, IAsyncLifetime
+public class LibraryEndpointsTests : IClassFixture<LibraryApiFactory>, IAsyncLifetime
 {
-    private readonly WebApplicationFactory<ILibraryApiMarker> _factory;
+    private readonly LibraryApiFactory _factory;
     private readonly List<string> _createdIsbns = new();
 
-    public LibraryEndpointsTests(WebApplicationFactory<ILibraryApiMarker> factory)
+    public LibraryEndpointsTests(LibraryApiFactory factory)
     {
         _factory = factory;
     }
@@ -191,8 +191,10 @@ public class LibraryEndpointsTests : IClassFixture<WebApplicationFactory<ILibrar
         _createdIsbns.Add(book.Isbn);
 
         var result = await httpClient.DeleteAsync($"books/{book.Isbn}");
+        var existingBooks = await (await httpClient.GetAsync("books")).Content.ReadFromJsonAsync<Book[]>();
 
-        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        result.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        existingBooks.Should().BeEmpty();
     }
 
     private Book BuildBook(string title = "The Dirty Coder")

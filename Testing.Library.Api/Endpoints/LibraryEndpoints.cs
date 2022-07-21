@@ -8,7 +8,7 @@ using System.Net.Mime;
 
 namespace Testing.Library.Api.Endpoints;
 
-public class LibraryEndpoints : IEndpoints
+public class BookEndpoints : IEndpoints
 {
     private const string Tag = "Books";
     private const string BaseRoute = "books";
