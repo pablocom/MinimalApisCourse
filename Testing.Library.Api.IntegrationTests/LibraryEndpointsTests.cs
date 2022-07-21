@@ -132,6 +132,69 @@ public class LibraryEndpointsTests : IClassFixture<WebApplicationFactory<ILibrar
         matchingBooks.Should().BeEquivalentTo(new[] { bookToBeFound });
     }
 
+    [Fact]
+    public async Task UdpateBook_UpdatesBook_WhenDataIsCorrect()
+    {
+        var httpClient = _factory.CreateClient();
+        var book = BuildBook();
+        await httpClient.PostAsJsonAsync("/books", book);
+        _createdIsbns.Add(book.Isbn);
+
+        book.Author = "New author";
+        book.Title = "New title";
+        book.PageCount = 1;
+        book.ReleaseDate = new DateTime(2022, 10, 25);
+        book.ShortDescription = "New description";
+
+        var result = await httpClient.PutAsJsonAsync($"books/{book.Isbn}", book);
+        var updatedBook = await result.Content.ReadFromJsonAsync<Book>();
+
+        result.StatusCode.Should().Be(HttpStatusCode.OK);
+        updatedBook.Should().BeEquivalentTo(book);
+    }
+
+    [Fact]
+    public async Task UdpateBook_DoesNotUpdateBook_WhenDataIsInCorrect()
+    {
+        var httpClient = _factory.CreateClient();
+        var book = BuildBook();
+        await httpClient.PostAsJsonAsync("/books", book);
+        _createdIsbns.Add(book.Isbn);
+
+        book.Title = string.Empty;
+
+        var result = await httpClient.PutAsJsonAsync($"books/{book.Isbn}", book);
+        var error = (await result.Content.ReadFromJsonAsync<IEnumerable<ValidationError>>())!.Single();
+
+        result.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        error.PropertyName.Should().Be(nameof(Book.Title));
+        error.ErrorMessage.Should().Be($"'{nameof(Book.Title)}' must not be empty.");
+    }
+
+    [Fact]
+    public async Task UdpateBook_ReturnsNotFound_WhenBookDoesNotExist()
+    {
+        var httpClient = _factory.CreateClient();
+        var book = BuildBook();
+
+        var result = await httpClient.PutAsJsonAsync($"books/{book.Isbn}", book);
+
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task DeleteBook_DeletesBook_WhenBookExist()
+    {
+        var httpClient = _factory.CreateClient();
+        var book = BuildBook();
+        await httpClient.PostAsJsonAsync("/books", book);
+        _createdIsbns.Add(book.Isbn);
+
+        var result = await httpClient.DeleteAsync($"books/{book.Isbn}");
+
+        result.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
     private Book BuildBook(string title = "The Dirty Coder")
     {
         return new Book

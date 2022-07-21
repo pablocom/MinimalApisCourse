@@ -6,7 +6,6 @@ public static class EndpointExtensions
 {
     public static void AddEndpoints<TAssemblyMarker>(this IServiceCollection services, IConfiguration configuration) 
         => AddEndpoints(services, typeof(TAssemblyMarker), configuration);
-
     public static void AddEndpoints(this IServiceCollection services, Type assemblyMarker, IConfiguration configuration)
     {
         var endpointTypes = GetEndpointTypesFromAssemblyContaining(assemblyMarker);
@@ -18,9 +17,7 @@ public static class EndpointExtensions
         }
     }
 
-    public static void UseEndpoints<TAssemblyMarker>(this IApplicationBuilder app) 
-        => UseEndpoints(app, typeof(TAssemblyMarker));
-
+    public static void UseEndpoints<TAssemblyMarker>(this IApplicationBuilder app) => UseEndpoints(app, typeof(TAssemblyMarker));
     public static void UseEndpoints(this IApplicationBuilder app, Type assemblyMarker)
     {
         var endpointTypes = GetEndpointTypesFromAssemblyContaining(assemblyMarker);
