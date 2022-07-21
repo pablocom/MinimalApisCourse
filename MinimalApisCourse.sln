@@ -35,9 +35,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E3926E6D-153
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8891BFC4-8E04-4DE6-A9E9-63560CDC5930}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing.Library.Api", "Testing.Library.Api\Testing.Library.Api.csproj", "{887872EF-5BE3-491E-9990-7882E3D9D60D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testing.Library.Api", "Testing.Library.Api\Testing.Library.Api.csproj", "{887872EF-5BE3-491E-9990-7882E3D9D60D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testing.Library.Api.IntegrationTests", "Testing.Library.Api.IntegrationTests\Testing.Library.Api.IntegrationTests.csproj", "{3AA5A305-96F5-44B6-BA86-9BF0EFAA3FBD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Testing.Library.Api.EndToEndTests", "Testing.Library.Api.IntegrationTests\Testing.Library.Api.EndToEndTests.csproj", "{3AA5A305-96F5-44B6-BA86-9BF0EFAA3FBD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
